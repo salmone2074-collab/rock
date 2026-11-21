@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>가위바위보 룰렛</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17252f;
+      --muted: #465761;
+      --paper: #fffdf7;
+      --blue: #1762a1;
+      --blue-dark: #104b7c;
+      --line: #cbd7dc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px 16px;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background: #eaf1f3;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    }
+
+    main {
+      width: min(100%, 720px);
+      padding: 32px 24px;
+      text-align: center;
+      background: var(--paper);
+      border: 2px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 12px 35px rgb(23 37 47 / 12%);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3rem);
+      line-height: 1.2;
+    }
+
+    .instructions {
+      margin: 12px 0 18px;
+      color: var(--muted);
+      font-size: clamp(1.15rem, 3.5vw, 1.5rem);
+      line-height: 1.5;
+    }
+
+    .result {
+      min-height: 1.35em;
+      margin: 0 0 18px;
+      color: var(--blue-dark);
+      font-size: clamp(2.6rem, 10vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .wheel-area {
+      position: relative;
+      width: min(100%, 500px);
+      margin: 0 auto 24px;
+      padding-top: 16px;
+    }
+
+    .pointer {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-top: 38px solid #b83226;
+      border-right: 25px solid transparent;
+      border-left: 25px solid transparent;
+      filter: drop-shadow(0 3px 2px rgb(0 0 0 / 20%));
+      transform: translateX(-50%);
+    }
+
+    .wheel {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      border: 8px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 4px 14px rgb(23 37 47 / 22%);
+      transition: transform 5s cubic-bezier(0.12, 0.7, 0.12, 1);
+      will-change: transform;
+    }
+
+    .wheel text {
+      fill: #17252f;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    button {
+      min-width: min(100%, 220px);
+      min-height: 76px;
+      padding: 14px 28px;
+      border: 3px solid transparent;
+      border-radius: 14px;
+      font: inherit;
+      font-size: clamp(1.6rem, 5vw, 2rem);
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:focus-visible {
+      outline: 5px solid #e6a700;
+      outline-offset: 4px;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .spin-button {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .spin-button:not(:disabled):hover {
+      background: var(--blue-dark);
+    }
+
+    .again-button {
+      color: var(--blue-dark);
+      background: #fff;
+      border-color: var(--blue);
+    }
+
+    .again-button:not(:disabled):hover {
+      background: #edf5fb;
+    }
+
+    @media (max-width: 520px) {
+      main {
+        padding: 28px 16px;
+      }
+
+      .wheel-area {
+        margin-bottom: 20px;
+      }
+
+      .wheel text {
+        font-size: 31px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .wheel {
+        transition-duration: 1.2s;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>가위바위보 룰렛</h1>
+    <p class="instructions">버튼을 누르면 원판이 천천히 멈춰요.</p>
+    <p class="result" id="result" role="status" aria-live="polite">준비</p>
+
+    <div class="wheel-area">
+      <div class="pointer" aria-hidden="true"></div>
+      <svg class="wheel" id="wheel" viewBox="0 0 400 400" role="img" aria-label="가위, 바위, 보 세 칸으로 나뉜 룰렛">
+        <path d="M200 200 L200 10 A190 190 0 0 1 364.545 295 Z" fill="#ffd66b" stroke="#fff" stroke-width="4"></path>
+        <path d="M200 200 L364.545 295 A190 190 0 0 1 35.455 295 Z" fill="#86c8f2" stroke="#fff" stroke-width="4"></path>
+        <path d="M200 200 L35.455 295 A190 190 0 0 1 200 10 Z" fill="#f3a5a5" stroke="#fff" stroke-width="4"></path>
+        <text x="297" y="144">가위</text>
+        <text x="200" y="312">바위</text>
+        <text x="103" y="144">보</text>
+        <circle cx="200" cy="200" r="13" fill="#fff" stroke="#17252f" stroke-width="4"></circle>
+      </svg>
+    </div>
+
+    <div class="buttons">
+      <button class="spin-button" id="spinButton" type="button">돌리기</button>
+      <button class="again-button" id="againButton" type="button" disabled>다시 돌리기</button>
+    </div>
+  </main>
+
+  <script>
+    const wheel = document.getElementById("wheel");
+    const result = document.getElementById("result");
+    const spinButton = document.getElementById("spinButton");
+    const againButton = document.getElementById("againButton");
+    const choices = [
+      { name: "가위", center: 60 },
+      { name: "바위", center: 180 },
+      { name: "보", center: 300 }
+    ];
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let rotation = 0;
+    let isSpinning = false;
+
+    function spin() {
+      if (isSpinning) return;
+
+      isSpinning = true;
+      spinButton.disabled = true;
+      againButton.disabled = true;
+      result.textContent = "돌리는 중";
+
+      const choice = choices[Math.floor(Math.random() * choices.length)];
+      const turns = 5 + Math.floor(Math.random() * 3);
+      const alignment = (360 - ((rotation + choice.center) % 360)) % 360;
+      rotation += turns * 360 + alignment;
+      wheel.style.transform = `rotate(${rotation}deg)`;
+
+      window.setTimeout(() => {
+        result.textContent = choice.name;
+        isSpinning = false;
+        spinButton.disabled = false;
+        againButton.disabled = false;
+      }, reducedMotion.matches ? 1200 : 5000);
+    }
+
+    spinButton.addEventListener("click", spin);
+    againButton.addEventListener("click", spin);
+  </script>
+</body>
+</html>
